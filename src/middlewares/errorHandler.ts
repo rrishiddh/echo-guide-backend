@@ -17,9 +17,12 @@ const globalErrorHandler = (
   });
 
   if (err instanceof ApiError) {
-    return errorResponse(res, err.message, err.statusCode, {
-      isOperational: err.isOperational,
-    });
+    return errorResponse(
+      res,
+      err.message,
+      err.statusCode,
+      err.data || { isOperational: err.isOperational }
+    );
   }
 
   if (err?.name === "ZodError" && err?.issues) {

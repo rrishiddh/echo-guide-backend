@@ -12,6 +12,7 @@ export interface IUser extends Document {
   name: string;
   email: string;
   password: string;
+  stripeCustomerId?: string;
   role: UserRole;
   profilePic?: string;
   bio?: string;

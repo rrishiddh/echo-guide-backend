@@ -18,7 +18,10 @@ const userSchema = new Schema<IUser>(
       unique: true,
       lowercase: true,
       trim: true,
-      match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Please provide a valid email address"],
+      match: [
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+        "Please provide a valid email address",
+      ],
     },
 
     password: {
@@ -33,6 +36,11 @@ const userSchema = new Schema<IUser>(
       enum: Object.values(UserRole),
       default: UserRole.TOURIST,
       required: true,
+    },
+    stripeCustomerId: {
+      type: String,
+      default: null,
+      index: true,
     },
 
     profilePic: { type: String, default: null },
@@ -55,7 +63,10 @@ const userSchema = new Schema<IUser>(
       type: [String],
       validate: {
         validator: function (this: IUser, value: string[] | undefined) {
-          return !(this.role === UserRole.GUIDE && (!value || value.length === 0));
+          return !(
+            this.role === UserRole.GUIDE &&
+            (!value || value.length === 0)
+          );
         },
         message: "Expertise is required for guides",
       },
@@ -101,10 +112,6 @@ userSchema.pre("save", async function (this: IUser) {
 
   this.password = await hashPassword(this.password);
 });
-
-
-
-
 
 userSchema.methods.comparePassword = async function (
   candidatePassword: string

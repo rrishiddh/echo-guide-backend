@@ -144,7 +144,7 @@ const handleWebhook = catchAsync(
 
       await paymentService.handleWebhookEvent(event);
 
-      res.status(httpStatus.OK).json({ received: true });
+      return res.status(httpStatus.OK).json({ received: true });
     } catch (error: any) {
       logger.error("Webhook error:", error);
       return res.status(httpStatus.BAD_REQUEST).json({
@@ -154,6 +154,7 @@ const handleWebhook = catchAsync(
     }
   }
 );
+
 
 export default {
   createPaymentIntent,

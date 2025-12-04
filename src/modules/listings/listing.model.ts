@@ -119,7 +119,7 @@ const listingSchema = new Schema<IListing>(
     toJSON: {
       virtuals: true,
       transform: function (_doc, ret) {
-        delete ret.__v;
+        delete (ret as any).__v;
         return ret;
       },
     },
@@ -135,7 +135,7 @@ listingSchema.index({ city: 1, country: 1 });
 listingSchema.index({ tourFee: 1 });
 listingSchema.index({ averageRating: -1 });
 listingSchema.index({ createdAt: -1 });
-listingSchema.index({ title: "text", description: "text" }); 
+listingSchema.index({ title: "text", description: "text" });
 
 listingSchema.virtual("guide", {
   ref: "User",

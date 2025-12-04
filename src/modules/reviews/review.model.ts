@@ -94,9 +94,10 @@ const reviewSchema = new Schema<IReview>(
     toJSON: {
       virtuals: true,
       transform: function (_doc, ret) {
-        delete ret.__v;
-        return ret;
-      },
+  delete (ret as any).__v;
+  return ret;
+}
+
     },
     toObject: {
       virtuals: true,

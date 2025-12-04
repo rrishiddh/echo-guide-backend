@@ -80,24 +80,24 @@ export const userIdParamSchema = z.object({
 
 export const toggleUserStatusSchema = z.object({
   isActive: z
-    .boolean({
-      required_error: "isActive is required",
-      invalid_type_error: "isActive must be a boolean",
-    }),
+    .boolean()
+    .refine((v) => typeof v === "boolean", "isActive must be a boolean"),
 });
+
 
 
 export const verifyUserSchema = z.object({
   isVerified: z
-    .boolean({
-      required_error: "isVerified is required",
-      invalid_type_error: "isVerified must be a boolean",
-    }),
+    .boolean()
+    .refine((v) => typeof v === "boolean", "isVerified must be a boolean"),
 });
 
 
+
 export const changeRoleSchema = z.object({
-  role: z.nativeEnum(UserRole, {
-    errorMap: () => ({ message: "Role must be tourist, guide, or admin" }),
-  }),
+  role: z.nativeEnum(UserRole)
+    .refine(
+      (v) => Object.values(UserRole).includes(v),
+      "Role must be tourist, guide, or admin"
+    ),
 });

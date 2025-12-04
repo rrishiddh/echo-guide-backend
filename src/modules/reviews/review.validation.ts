@@ -150,18 +150,18 @@ export const reportReviewSchema = z.object({
 
 export const markHelpfulSchema = z.object({
   helpful: z
-    .boolean({
-      required_error: "helpful is required",
-      invalid_type_error: "helpful must be a boolean",
+    .boolean()
+    .refine((val) => typeof val === "boolean", {
+      message: "helpful must be a boolean",
     }),
-});
+});;
 
 
 export const hideReviewSchema = z.object({
   isHidden: z
-    .boolean({
-      required_error: "isHidden is required",
-      invalid_type_error: "isHidden must be a boolean",
+    .boolean()
+    .refine((val) => typeof val === "boolean", {
+      message: "isHidden must be a boolean",
     }),
   reason: z
     .string()

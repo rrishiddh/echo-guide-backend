@@ -5,6 +5,7 @@ import listingRoutes from "../modules/listings/listing.routes";
 import bookingRoutes from "../modules/bookings/booking.routes";
 import reviewRoutes from "../modules/reviews/review.routes";
 import paymentRoutes from "../modules/payments/payment.routes";
+import adminRoutes from "../modules/admin/admin.routes";
 
 const router = express.Router();
 
@@ -18,5 +19,6 @@ router.use("/listings", listingRoutes);
 router.use("/bookings", bookingRoutes);
 router.use("/reviews", reviewRoutes);
 router.use("/payments", paymentRoutes);
+router.use("/admin", adminRoutes);
 
 export default router;

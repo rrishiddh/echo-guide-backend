@@ -6,20 +6,35 @@ import { ParsedQs } from "qs";
 import routes from "./routes";
 import globalErrorHandler from "./middlewares/errorHandler";
 import notFound from "./middlewares/notFound";
+import dotenv from 'dotenv';
 
 const app: Application = express();
+dotenv.config();
 
 app.set("trust proxy", true); 
 
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: false,
+}));
+
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  "http://localhost:3000",
+].filter(Boolean);
 
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    origin(origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("CORS blocked: " + origin));
+      }
+    },
     credentials: true,
   })
 );
-
+app.options("*", cors());
 type CustomRequest = Request<
     Record<string, string>, 
     any, 

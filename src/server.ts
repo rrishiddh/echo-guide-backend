@@ -1,35 +1,37 @@
 import app from "./app";
 import config from "./config";
 import { logger } from "./config/logger";
-import database from "./config/database";
+import { connectDatabase } from "./config/database";
+import mongoose from "mongoose";
 
 const PORT = config.port || 5000;
 
 async function serverCall() {
   try {
-    await database.connect(); 
+    // Connect to MongoDB before starting the server
+    await connectDatabase();
 
     const server = app.listen(PORT, () => {
       logger.info(`Server running on port ${PORT}`);
     });
 
-    process.on("SIGTERM", () => {
-      logger.info("SIGTERM received, closing server...");
+    const gracefulShutdown = async (signal: string) => {
+      logger.info(`${signal} received, closing server...`);
       server.close(async () => {
-        await database.disconnect();
-        logger.info("Server closed gracefully");
-        process.exit(0);
+        try {
+          await mongoose.disconnect();
+          logger.info("MongoDB disconnected");
+          logger.info("Server closed gracefully");
+          process.exit(0);
+        } catch (err) {
+          logger.error("Error during shutdown:", err);
+          process.exit(1);
+        }
       });
-    });
+    };
 
-    process.on("SIGINT", () => {
-      logger.info("SIGINT received, closing server...");
-      server.close(async () => {
-        await database.disconnect();
-        logger.info("Server closed gracefully");
-        process.exit(0);
-      });
-    });
+    process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+    process.on("SIGINT", () => gracefulShutdown("SIGINT"));
   } catch (error) {
     logger.error("Failed to start server:", error);
     process.exit(1);

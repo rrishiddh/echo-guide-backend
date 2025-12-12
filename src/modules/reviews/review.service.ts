@@ -4,6 +4,7 @@ import Booking from "../bookings/booking.model";
 import Listing from "../listings/listing.model";
 import User from "../users/user.model";
 import ApiError from "../../utils/ApiError";
+import { connectDatabase } from "../../config/database";
 import {
   ICreateReviewRequest,
   IUpdateReviewRequest,
@@ -25,6 +26,7 @@ const createReview = async (
   touristId: string,
   payload: ICreateReviewRequest
 ) => {
+  await connectDatabase();
   const booking = await Booking.findById(payload.bookingId);
 
   if (!booking) {
@@ -82,6 +84,7 @@ const createReview = async (
 
 
 const getReviewById = async (reviewId: string) => {
+  await connectDatabase();
   const review = await Review.findById(reviewId).populate([
     { path: "tourist", select: "name profilePic" },
     { path: "guide", select: "name profilePic" },
@@ -99,6 +102,7 @@ const getReviewById = async (reviewId: string) => {
 const getAllReviews = async (
   query: IReviewQuery
 ): Promise<IReviewListResponse> => {
+  await connectDatabase();
   const {
     touristId,
     guideId,
@@ -225,6 +229,7 @@ const updateReview = async (
   touristId: string,
   payload: IUpdateReviewRequest
 ) => {
+  await connectDatabase();
   const review = await Review.findById(reviewId);
 
   if (!review) {
@@ -270,6 +275,7 @@ const deleteReview = async (
   reviewId: string,
   touristId: string
 ): Promise<void> => {
+  await connectDatabase();
   const review = await Review.findById(reviewId);
 
   if (!review) {
@@ -293,6 +299,7 @@ const markReviewHelpful = async (
   reviewId: string,
   helpful: boolean
 ): Promise<void> => {
+  await connectDatabase();
   const review = await Review.findById(reviewId);
 
   if (!review) {
@@ -314,6 +321,7 @@ const reportReview = async (
   userId: string,
   reason: string
 ): Promise<void> => {
+  await connectDatabase();
   const review = await Review.findById(reviewId);
 
   if (!review) {
@@ -339,6 +347,7 @@ const toggleReviewVisibility = async (
   isHidden: boolean,
   reason?: string
 ): Promise<void> => {
+  await connectDatabase();
   const review = await Review.findById(reviewId);
 
   if (!review) {
@@ -355,6 +364,7 @@ const toggleReviewVisibility = async (
 
 
 const getReviewStats = async (): Promise<IReviewStats> => {
+  await connectDatabase();
   const totalReviews = await Review.countDocuments();
   const verifiedReviews = await Review.countDocuments({ isVerified: true });
   const hiddenReviews = await Review.countDocuments({ isHidden: true });
@@ -439,6 +449,7 @@ const getReviewStats = async (): Promise<IReviewStats> => {
 const getGuideReviewSummary = async (
   guideId: string
 ): Promise<IGuideReviewSummary> => {
+  await connectDatabase();
   const reviews = await Review.find({ guideId, isHidden: false });
 
   const totalReviews = reviews.length;

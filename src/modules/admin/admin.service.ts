@@ -9,6 +9,7 @@ import { logger } from "../../config/logger";
 import { UserRole } from "../auth/auth.interface";
 import { ListingStatus } from "../listings/listing.interface";
 import { BookingStatus, PaymentStatus } from "../bookings/booking.interface";
+import { connectDatabase } from "../../config/database";
  
 const getDashboardOverview = async (startDate?: Date, endDate?: Date) => {
   const dateFilter: any = {};
@@ -396,6 +397,7 @@ const getSystemHealth = async () => {
 
 const checkDatabaseConnection = async () => {
   try {
+     await connectDatabase();
     await User.findOne().limit(1);
     return { status: "connected", message: "Database connection healthy" };
   } catch (error) {

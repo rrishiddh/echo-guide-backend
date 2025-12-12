@@ -419,7 +419,7 @@ export interface AuditTrail {
 export interface EnvironmentVariables {
   NODE_ENV: "development" | "production" | "test" | "staging";
   PORT: string;
-  DATABASE_URL: string;
+  MONGODB_URI: string;
   JWT_SECRET: string;
   JWT_EXPIRES_IN: string;
   JWT_REFRESH_SECRET?: string;

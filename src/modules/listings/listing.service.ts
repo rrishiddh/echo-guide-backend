@@ -2,6 +2,7 @@ import httpStatus from "http-status";
 import Listing from "./listing.model";
 import User from "../users/user.model";
 import ApiError from "../../utils/ApiError";
+import { connectDatabase } from "../../config/database";
 import {
   ICreateListingRequest,
   IUpdateListingRequest,
@@ -20,6 +21,7 @@ const createListing = async (
   guideId: string,
   payload: ICreateListingRequest
 ) => {
+  await connectDatabase();
   const guide = await User.findById(guideId);
 
   if (!guide) {
@@ -52,6 +54,7 @@ const createListing = async (
 
 
 const getListingById = async (listingId: string, populateGuide = true) => {
+  await connectDatabase();
   let query = Listing.findById(listingId);
 
   if (populateGuide) {
@@ -71,6 +74,7 @@ const getListingById = async (listingId: string, populateGuide = true) => {
 const getAllListings = async (
   query: IListingQuery
 ): Promise<IListingListResponse> => {
+  await connectDatabase();
   const {
     guideId,
     category,
@@ -171,6 +175,7 @@ const updateListing = async (
   guideId: string,
   payload: IUpdateListingRequest
 ) => {
+  await connectDatabase();
   const listing = await Listing.findById(listingId);
 
   if (!listing) {
@@ -197,6 +202,7 @@ const deleteListing = async (
   listingId: string,
   guideId: string
 ): Promise<void> => {
+  await connectDatabase();
   const listing = await Listing.findById(listingId);
 
   if (!listing) {
@@ -219,6 +225,7 @@ const deleteListing = async (
 
 
 const permanentlyDeleteListing = async (listingId: string): Promise<void> => {
+  await connectDatabase();
   const listing = await Listing.findByIdAndDelete(listingId);
 
   if (!listing) {
@@ -249,6 +256,7 @@ const searchListings = async (
 
 
 const getFeaturedListings = async (limit = 10) => {
+  await connectDatabase();
   const listings = await Listing.find({
     isActive: true,
     status: ListingStatus.ACTIVE,
@@ -263,6 +271,7 @@ const getFeaturedListings = async (limit = 10) => {
 
 
 const getPopularListings = async (limit = 10) => {
+  await connectDatabase();
   const listings = await Listing.find({
     isActive: true,
     status: ListingStatus.ACTIVE,
@@ -276,6 +285,7 @@ const getPopularListings = async (limit = 10) => {
 
 
 const getRecentListings = async (limit = 10) => {
+  await connectDatabase();
   const listings = await Listing.find({
     isActive: true,
     status: ListingStatus.ACTIVE,
@@ -289,6 +299,7 @@ const getRecentListings = async (limit = 10) => {
 
 
 const getListingStats = async (): Promise<IListingStats> => {
+  await connectDatabase();
   const totalListings = await Listing.countDocuments();
   const activeListings = await Listing.countDocuments({
     status: ListingStatus.ACTIVE,
@@ -353,6 +364,7 @@ const updateListingRating = async (
   listingId: string,
   newRating: number
 ): Promise<void> => {
+  await connectDatabase();
   const listing = await Listing.findById(listingId);
 
   if (!listing) {
@@ -373,6 +385,7 @@ const updateListingRating = async (
 
 
 const incrementBookingCount = async (listingId: string): Promise<void> => {
+  await connectDatabase();
   const listing = await Listing.findById(listingId);
 
   if (!listing) {

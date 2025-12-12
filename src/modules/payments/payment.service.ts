@@ -3,6 +3,7 @@ import Payment from "./payment.model";
 import Booking from "../bookings/booking.model";
 import User from "../users/user.model";
 import ApiError from "../../utils/ApiError";
+import { connectDatabase } from "../../config/database";
 import {
   ICreatePaymentIntentRequest,
   IConfirmPaymentRequest,
@@ -31,6 +32,7 @@ const createPaymentIntent = async (
   touristId: string,
   payload: ICreatePaymentIntentRequest
 ) => {
+  await connectDatabase();
   const booking = await Booking.findById(payload.bookingId).populate("listing");
 
   if (!booking) {
@@ -129,6 +131,7 @@ const confirmPayment = async (
   touristId: string,
   payload: IConfirmPaymentRequest
 ) => {
+  await connectDatabase();
   const payment = await Payment.findOne({
     paymentIntentId: payload.paymentIntentId,
   });
@@ -172,6 +175,7 @@ const confirmPayment = async (
 };
 
 const getPaymentById = async (paymentId: string) => {
+  await connectDatabase();
   const payment = await Payment.findById(paymentId).populate([
     { path: "tourist", select: "name email profilePic" },
     { path: "guide", select: "name email profilePic" },
@@ -188,6 +192,7 @@ const getPaymentById = async (paymentId: string) => {
 const getAllPayments = async (
   query: IPaymentQuery
 ): Promise<IPaymentListResponse> => {
+  await connectDatabase();
   const {
     touristId,
     guideId,
@@ -302,6 +307,7 @@ const refundPayment = async (
   paymentId: string,
   payload: IRefundPaymentRequest
 ) => {
+  await connectDatabase();
   const payment = await Payment.findById(paymentId);
 
   if (!payment) {
@@ -375,6 +381,7 @@ const refundPayment = async (
 };
 
 const getPaymentStats = async (): Promise<IPaymentStats> => {
+  await connectDatabase();
   const totalPayments = await Payment.countDocuments();
 
   const amountResult = await Payment.aggregate([
@@ -474,6 +481,7 @@ const getPaymentStats = async (): Promise<IPaymentStats> => {
 };
 
 const handleWebhookEvent = async (event: any) => {
+  await connectDatabase();
   logger.info(`Processing webhook event: ${event.type}`);
 
   switch (event.type) {

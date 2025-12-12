@@ -14,8 +14,11 @@ import {
   UserRole,
 } from "./auth.interface";
 import { logger } from "../../config/logger";
+import { connectDatabase } from "../../config/database";
 
 const register = async (payload: IRegisterRequest): Promise<ILoginResponse> => {
+  await connectDatabase();
+
   const existingUser = await User.findOne({ email: payload.email });
   if (existingUser) {
     throw new ApiError(
@@ -29,7 +32,7 @@ const register = async (payload: IRegisterRequest): Promise<ILoginResponse> => {
   const tokenPayload: TokenPayload = {
     userId: user._id.toString(),
     email: user.email,
-    role: user.role as "tourist" | "guide" | "admin",
+    role: user.role as UserRole,
   };
 
   const { accessToken, refreshToken } = generateTokens(tokenPayload);
@@ -51,13 +54,12 @@ const register = async (payload: IRegisterRequest): Promise<ILoginResponse> => {
 };
 
 const login = async (payload: ILoginRequest): Promise<ILoginResponse> => {
+  await connectDatabase();
+
   const user = await User.findOne({ email: payload.email }).select("+password");
 
   if (!user) {
-    throw new ApiError(
-      httpStatus.UNAUTHORIZED,
-      "Invalid email or password"
-    );
+    throw new ApiError(httpStatus.UNAUTHORIZED, "Invalid email or password");
   }
 
   if (!user.isActive) {
@@ -70,16 +72,13 @@ const login = async (payload: ILoginRequest): Promise<ILoginResponse> => {
   const isPasswordValid = await user.comparePassword(payload.password);
 
   if (!isPasswordValid) {
-    throw new ApiError(
-      httpStatus.UNAUTHORIZED,
-      "Invalid email or password"
-    );
+    throw new ApiError(httpStatus.UNAUTHORIZED, "Invalid email or password");
   }
 
   const tokenPayload: TokenPayload = {
     userId: user._id.toString(),
     email: user.email,
-    role: user.role as "tourist" | "guide" | "admin",
+    role: user.role as UserRole,
   };
 
   const { accessToken, refreshToken } = generateTokens(tokenPayload);
@@ -103,6 +102,8 @@ const login = async (payload: ILoginRequest): Promise<ILoginResponse> => {
 const refreshAccessToken = async (
   refreshToken: string
 ): Promise<{ accessToken: string }> => {
+  await connectDatabase();
+
   const decoded = verifyRefreshToken(refreshToken);
 
   const user = await User.findById(decoded.userId);
@@ -124,7 +125,7 @@ const refreshAccessToken = async (
   const tokenPayload: TokenPayload = {
     userId: user._id.toString(),
     email: user.email,
-    role: user.role as "tourist" | "guide" | "admin",
+    role: user.role as UserRole,
   };
 
   const { accessToken } = generateTokens(tokenPayload);
@@ -133,6 +134,8 @@ const refreshAccessToken = async (
 };
 
 const getProfile = async (userId: string) => {
+  await connectDatabase();
+
   const user = await User.findById(userId);
 
   if (!user) {
@@ -146,6 +149,8 @@ const changePassword = async (
   userId: string,
   payload: IChangePasswordRequest
 ): Promise<void> => {
+  await connectDatabase();
+
   const user = await User.findById(userId).select("+password");
 
   if (!user) {
@@ -172,6 +177,8 @@ const logout = async (userId: string): Promise<void> => {
 };
 
 const forgotPassword = async (email: string): Promise<void> => {
+  await connectDatabase();
+
   const user = await User.findOne({ email });
 
   if (!user) {
@@ -186,7 +193,9 @@ const resetPassword = async (
   token: string,
   newPassword: string
 ): Promise<void> => {
-  logger.info(`Password reset attempted with token: ${token.substring(0, 10)}...`);
+  logger.info(
+    `Password reset attempted with token: ${token.substring(0, 10)}...`
+  );
 
   throw new ApiError(
     httpStatus.NOT_IMPLEMENTED,

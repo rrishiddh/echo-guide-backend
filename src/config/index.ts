@@ -3,7 +3,7 @@ import path from "path";
 
 dotenv.config({ path: path.join(process.cwd(), ".env") });
 
-const requiredEnvVars = ["DATABASE_URL", "JWT_SECRET"];
+const requiredEnvVars = ["MONGODB_URI", "JWT_SECRET"];
 for (const envVar of requiredEnvVars) {
   if (!process.env[envVar]) {
     throw new Error(`Missing required environment variable: ${envVar}`);
@@ -13,7 +13,7 @@ for (const envVar of requiredEnvVars) {
 export default {
   env: process.env.NODE_ENV || "development",
   port: process.env.PORT || 5000,
-  database_url: process.env.DATABASE_URL as string,
+  MONGODB_URI: process.env.MONGODB_URI as string,
   
   jwt_secret: process.env.JWT_SECRET as string,
   jwt_expires: process.env.JWT_EXPIRES_IN || "10d",

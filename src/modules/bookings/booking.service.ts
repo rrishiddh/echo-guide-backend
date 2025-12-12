@@ -3,6 +3,7 @@ import Booking from "./booking.model";
 import Listing from "../listings/listing.model";
 import User from "../users/user.model";
 import ApiError from "../../utils/ApiError";
+import { connectDatabase } from "../../config/database"; 
 import {
   ICreateBookingRequest,
   IUpdateBookingStatusRequest,
@@ -24,6 +25,7 @@ const createBooking = async (
   touristId: string,
   payload: ICreateBookingRequest
 ) => {
+  await connectDatabase(); 
   const tourist = await User.findById(touristId);
 
   if (!tourist) {
@@ -69,7 +71,7 @@ const createBooking = async (
   const [hours, minutes] = payload.startTime.split(":").map(Number);
   const startMinutes = hours * 60 + minutes;
   const endMinutes = startMinutes + listing.duration * 60;
-  
+
   const endHours = Math.floor(endMinutes / 60) % 24;
   const endMins = endMinutes % 60;
   const endTime = `${String(endHours).padStart(2, "0")}:${String(endMins).padStart(2, "0")}`;
@@ -99,6 +101,7 @@ const createBooking = async (
 
 
 const getBookingById = async (bookingId: string) => {
+  await connectDatabase(); 
   const booking = await Booking.findById(bookingId).populate([
     { path: "tourist", select: "name email profilePic languagesSpoken" },
     { path: "guide", select: "name email profilePic bio languagesSpoken expertise" },
@@ -116,6 +119,7 @@ const getBookingById = async (bookingId: string) => {
 const getAllBookings = async (
   query: IBookingQuery
 ): Promise<IBookingListResponse> => {
+  await connectDatabase(); 
   const {
     touristId,
     guideId,
@@ -197,6 +201,7 @@ const updateBookingStatus = async (
   guideId: string,
   payload: IUpdateBookingStatusRequest
 ) => {
+  await connectDatabase(); 
   const booking = await Booking.findById(bookingId);
 
   if (!booking) {
@@ -249,6 +254,7 @@ const cancelBooking = async (
   userId: string,
   payload: ICancelBookingRequest
 ) => {
+  await connectDatabase(); 
   const booking = await Booking.findById(bookingId);
 
   if (!booking) {
@@ -304,6 +310,7 @@ const cancelBooking = async (
 
 
 const completeBooking = async (bookingId: string) => {
+  await connectDatabase(); 
   const booking = await Booking.findById(bookingId);
 
   if (!booking) {
@@ -338,6 +345,7 @@ const getTouristBookings = async (
   touristId: string,
   query: IBookingQuery
 ): Promise<IBookingListResponse> => {
+  // getTouristBookings calls getAllBookings which already has connectDatabase()
   return getAllBookings({ ...query, touristId });
 };
 
@@ -346,11 +354,13 @@ const getGuideBookings = async (
   guideId: string,
   query: IBookingQuery
 ): Promise<IBookingListResponse> => {
+  // getGuideBookings calls getAllBookings which already has connectDatabase()
   return getAllBookings({ ...query, guideId });
 };
 
 
 const getUpcomingBookings = async (userId: string, role: "tourist" | "guide") => {
+  await connectDatabase(); 
   const field = role === "tourist" ? "touristId" : "guideId";
 
   const bookings = await Booking.find({
@@ -370,6 +380,7 @@ const getUpcomingBookings = async (userId: string, role: "tourist" | "guide") =>
 
 
 const getPastBookings = async (userId: string, role: "tourist" | "guide") => {
+  await connectDatabase(); 
   const field = role === "tourist" ? "touristId" : "guideId";
 
   const bookings = await Booking.find({
@@ -391,6 +402,7 @@ const getPastBookings = async (userId: string, role: "tourist" | "guide") => {
 
 
 const getBookingStats = async (): Promise<IBookingStats> => {
+  await connectDatabase(); 
   const totalBookings = await Booking.countDocuments();
   const pendingBookings = await Booking.countDocuments({ status: BookingStatus.PENDING });
   const confirmedBookings = await Booking.countDocuments({ status: BookingStatus.CONFIRMED });
@@ -448,6 +460,7 @@ const getBookingStats = async (): Promise<IBookingStats> => {
 
 
 const getGuideEarnings = async (guideId: string): Promise<IGuideEarnings> => {
+  await connectDatabase(); 
   const earningsResult = await Booking.aggregate([
     {
       $match: {

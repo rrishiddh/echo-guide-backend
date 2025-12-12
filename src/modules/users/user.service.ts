@@ -1,6 +1,7 @@
 import httpStatus from "http-status";
 import User from "./user.model";
 import ApiError from "../../utils/ApiError";
+import { connectDatabase } from "../../config/database";
 import {
   IUpdateUserRequest,
   IUserQuery,
@@ -12,6 +13,7 @@ import { parsePaginationParams, calculatePagination } from "../../utils/helpers"
 import { UserRole } from "../auth/auth.interface";
 
 const getUserById = async (userId: string) => {
+  await connectDatabase();
   const user = await User.findById(userId);
 
   if (!user) {
@@ -23,6 +25,7 @@ const getUserById = async (userId: string) => {
 
 
 const getAllUsers = async (query: IUserQuery): Promise<IUserListResponse> => {
+  await connectDatabase();
   const { page = 1, limit = 10, role, isVerified, isActive, search, sortBy = "-createdAt" } = query;
 
   const filter: any = {};
@@ -76,6 +79,7 @@ const updateUser = async (
   userId: string,
   payload: IUpdateUserRequest
 ) => {
+  await connectDatabase();
   const user = await User.findById(userId);
 
   if (!user) {
@@ -107,6 +111,7 @@ const updateUser = async (
 
 
 const deleteUser = async (userId: string): Promise<void> => {
+  await connectDatabase();
   const user = await User.findById(userId);
 
   if (!user) {
@@ -121,6 +126,7 @@ const deleteUser = async (userId: string): Promise<void> => {
 
 
 const permanentlyDeleteUser = async (userId: string): Promise<void> => {
+  await connectDatabase();
   const user = await User.findByIdAndDelete(userId);
 
   if (!user) {
@@ -135,6 +141,7 @@ const toggleUserStatus = async (
   userId: string,
   isActive: boolean
 ) => {
+  await connectDatabase();
   const user = await User.findById(userId);
 
   if (!user) {
@@ -154,6 +161,7 @@ const verifyUser = async (
   userId: string,
   isVerified: boolean
 ) => {
+  await connectDatabase();
   const user = await User.findById(userId);
 
   if (!user) {
@@ -173,6 +181,7 @@ const changeUserRole = async (
   userId: string,
   newRole: UserRole
 ) => {
+  await connectDatabase();
   const user = await User.findById(userId);
 
   if (!user) {
@@ -196,6 +205,7 @@ const changeUserRole = async (
 
 
 const getUserStats = async (): Promise<IUserStats> => {
+  await connectDatabase();
   const totalUsers = await User.countDocuments();
   const totalTourists = await User.countDocuments({ role: UserRole.TOURIST });
   const totalGuides = await User.countDocuments({ role: UserRole.GUIDE });
@@ -221,6 +231,7 @@ const getUserStats = async (): Promise<IUserStats> => {
 };
 
 const getAllGuides = async (query: IUserQuery): Promise<IUserListResponse> => {
+  await connectDatabase();
   const { page = 1, limit = 10, search, sortBy = "-createdAt" } = query;
 
   const filter: any = {
@@ -271,6 +282,7 @@ const searchGuides = async (filters: {
   page?: number;
   limit?: number;
 }): Promise<IUserListResponse> => {
+  await connectDatabase();
   const { languages, expertise, minRate, maxRate, page = 1, limit = 10 } = filters;
 
   const filter: any = {

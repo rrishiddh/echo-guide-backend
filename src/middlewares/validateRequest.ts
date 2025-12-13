@@ -15,7 +15,6 @@ export const validateRequest = (
       const dataToValidate = req[source];
       const validated = await schema.parseAsync(dataToValidate);
 
-      // ✅ Attach validated data to a separate property
       switch (source) {
         case "body":
           (req as any).validatedBody = validated;

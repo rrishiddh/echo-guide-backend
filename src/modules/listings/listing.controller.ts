@@ -12,6 +12,7 @@ const createListing = catchAsync(
     const guideId = req.user!.userId;
 
     let imageUrls: string[] = [];
+
     if (req.files && Array.isArray(req.files) && req.files.length > 0) {
       const dataUrls = processUploadedFiles(req.files);
       const uploadResults = await uploadMultipleToCloudinary(
@@ -21,14 +22,30 @@ const createListing = catchAsync(
       imageUrls = uploadResults.map((result) => result.url);
     }
 
+    if (req.body.images) {
+      if (Array.isArray(req.body.images)) {
+        imageUrls = [...imageUrls, ...req.body.images];
+      } else if (typeof req.body.images === "string") {
+        imageUrls = [...imageUrls, req.body.images];
+      }
+    }
+
+    if (imageUrls.length === 0) {
+      return res.status(httpStatus.BAD_REQUEST).json({
+        success: false,
+        message: "No images provided",
+        errors: { isOperational: true },
+      });
+    }
+
     const listingData = {
       ...req.body,
-      images: imageUrls.length > 0 ? imageUrls : req.body.images || [],
+      images: imageUrls,
     };
 
     const result = await listingService.createListing(guideId, listingData);
 
-    successResponse(
+    return successResponse(
       res,
       result,
       "Listing created successfully!",
@@ -37,6 +54,7 @@ const createListing = catchAsync(
     );
   }
 );
+
 
 
 const getListingById = catchAsync(

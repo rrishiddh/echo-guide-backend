@@ -113,7 +113,7 @@ bookingSchema.index({ touristId: 1, status: 1 });
 bookingSchema.index({ guideId: 1, status: 1 });
 bookingSchema.index({ listingId: 1, bookingDate: 1 });
 bookingSchema.index({ status: 1, paymentStatus: 1 });
-bookingSchema.index({ bookingDate: 1 });
+// bookingSchema.index({ bookingDate: 1 });
 bookingSchema.index({ createdAt: -1 });
 
 bookingSchema.virtual("tourist", {

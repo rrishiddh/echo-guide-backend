@@ -88,17 +88,23 @@ export const uploadSingle = (fieldName: string = "image") => {
 };
 
 
-export const uploadMultiple = (fieldName: string = "images", maxCount: number = 10) => {
+export const uploadMultiple = (
+  fieldName: string = "images",
+  maxCount: number = 10
+) => {
   return (req: Request, res: any, next: any) => {
     const uploadMiddleware = upload.array(fieldName, maxCount);
 
     uploadMiddleware(req, res, (error: any) => {
+      // Handle multer errors
       if (error instanceof multer.MulterError) {
         if (error.code === "LIMIT_FILE_SIZE") {
           return next(
             new ApiError(
               httpStatus.BAD_REQUEST,
-              `File size too large. Maximum size is ${MAX_FILE_SIZE / (1024 * 1024)}MB per file.`
+              `File size too large. Maximum size is ${
+                MAX_FILE_SIZE / (1024 * 1024)
+              }MB per file.`
             )
           );
         }
@@ -127,13 +133,33 @@ export const uploadMultiple = (fieldName: string = "images", maxCount: number = 
         );
       }
 
+      // Other errors
       if (error) {
         return next(error);
       }
 
-      if (!req.files || (req.files as Express.Multer.File[]).length === 0) {
+      /** 
+       * 🔥 New Logic:
+       * Accept Cloudinary URLs (from req.body.images) 
+       * OR uploaded files (req.files)
+       */
+
+      const bodyImages = req.body?.images;
+
+      const hasUrlImages =
+        bodyImages &&
+        (Array.isArray(bodyImages)
+          ? bodyImages.length > 0
+          : typeof bodyImages === "string");
+
+      const hasUploadedFiles = req.files && (req.files as Express.Multer.File[]).length > 0;
+
+      if (!hasUrlImages && !hasUploadedFiles) {
         return next(
-          new ApiError(httpStatus.BAD_REQUEST, "No files uploaded")
+          new ApiError(
+            httpStatus.BAD_REQUEST,
+            "No images provided. Upload files or provide Cloudinary URLs."
+          )
         );
       }
 
@@ -141,6 +167,7 @@ export const uploadMultiple = (fieldName: string = "images", maxCount: number = 
     });
   };
 };
+
 
 
 export const uploadFields = (

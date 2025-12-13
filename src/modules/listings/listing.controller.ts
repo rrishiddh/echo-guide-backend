@@ -6,10 +6,11 @@ import listingService from "./listing.service";
 import { uploadMultipleToCloudinary } from "../../config/cloudinary";
 import { processUploadedFiles } from "../../middlewares/uploadHandler";
 
-
 const createListing = catchAsync(
   async (req: Request, res: Response, _next: NextFunction) => {
     const guideId = req.user!.userId;
+
+    const body = (req as any).validatedBody || req.body;
 
     let imageUrls: string[] = [];
 
@@ -22,11 +23,11 @@ const createListing = catchAsync(
       imageUrls = uploadResults.map((result) => result.url);
     }
 
-    if (req.body.images) {
-      if (Array.isArray(req.body.images)) {
-        imageUrls = [...imageUrls, ...req.body.images];
-      } else if (typeof req.body.images === "string") {
-        imageUrls = [...imageUrls, req.body.images];
+    if (body.images) {
+      if (Array.isArray(body.images)) {
+        imageUrls = [...imageUrls, ...body.images];
+      } else if (typeof body.images === "string") {
+        imageUrls = [...imageUrls, body.images];
       }
     }
 
@@ -39,7 +40,7 @@ const createListing = catchAsync(
     }
 
     const listingData = {
-      ...req.body,
+      ...body,
       images: imageUrls,
     };
 
@@ -55,11 +56,10 @@ const createListing = catchAsync(
   }
 );
 
-
-
 const getListingById = catchAsync(
   async (req: Request, res: Response, _next: NextFunction) => {
-    const result = await listingService.getListingById(req.params.id);
+    const params = (req as any).validatedParams || req.params;
+    const result = await listingService.getListingById(params.id);
 
     successResponse(
       res,
@@ -73,7 +73,8 @@ const getListingById = catchAsync(
 
 const getAllListings = catchAsync(
   async (req: Request, res: Response, _next: NextFunction) => {
-    const result = await listingService.getAllListings(req.query);
+    const query = (req as any).validatedQuery || req.query;
+    const result = await listingService.getAllListings(query);
     successResponse(
       res,
       result.listings,
@@ -84,10 +85,10 @@ const getAllListings = catchAsync(
   }
 );
 
-
 const searchListings = catchAsync(
   async (req: Request, res: Response, _next: NextFunction) => {
-    const result = await listingService.searchListings(req.query);
+    const query = (req as any).validatedQuery || req.query;
+    const result = await listingService.searchListings(query);
     successResponse(
       res,
       result.listings,
@@ -98,10 +99,10 @@ const searchListings = catchAsync(
   }
 );
 
-
 const getFeaturedListings = catchAsync(
   async (req: Request, res: Response, _next: NextFunction) => {
-    const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
+    const query = (req as any).validatedQuery || req.query;
+    const limit = query.limit ? parseInt(query.limit as string) : 10;
     const result = await listingService.getFeaturedListings(limit);
     successResponse(
       res,
@@ -113,10 +114,10 @@ const getFeaturedListings = catchAsync(
   }
 );
 
-
 const getPopularListings = catchAsync(
   async (req: Request, res: Response, _next: NextFunction) => {
-    const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
+    const query = (req as any).validatedQuery || req.query;
+    const limit = query.limit ? parseInt(query.limit as string) : 10;
     const result = await listingService.getPopularListings(limit);
     successResponse(
       res,
@@ -128,10 +129,10 @@ const getPopularListings = catchAsync(
   }
 );
 
-
 const getRecentListings = catchAsync(
   async (req: Request, res: Response, _next: NextFunction) => {
-    const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
+    const query = (req as any).validatedQuery || req.query;
+    const limit = query.limit ? parseInt(query.limit as string) : 10;
     const result = await listingService.getRecentListings(limit);
     successResponse(
       res,
@@ -143,12 +144,13 @@ const getRecentListings = catchAsync(
   }
 );
 
-
 const getListingsByGuide = catchAsync(
   async (req: Request, res: Response, _next: NextFunction) => {
+    const query = (req as any).validatedQuery || req.query;
+    const params = (req as any).validatedParams || req.params;
     const result = await listingService.getListingsByGuide(
-      req.params.guideId,
-      req.query
+      params.guideId,
+      query
     );
     successResponse(
       res,
@@ -160,10 +162,11 @@ const getListingsByGuide = catchAsync(
   }
 );
 
-
 const updateListing = catchAsync(
   async (req: Request, res: Response, _next: NextFunction) => {
     const guideId = req.user!.userId;
+    const body = (req as any).validatedBody || req.body;
+
     let imageUrls: string[] = [];
     if (req.files && Array.isArray(req.files) && req.files.length > 0) {
       const dataUrls = processUploadedFiles(req.files);
@@ -173,15 +176,15 @@ const updateListing = catchAsync(
       );
       imageUrls = uploadResults.map((result) => result.url);
     }
+
     const updateData = {
-      ...req.body,
+      ...body,
       ...(imageUrls.length > 0 && { images: imageUrls }),
     };
-    const result = await listingService.updateListing(
-      req.params.id,
-      guideId,
-      updateData
-    );
+
+    const params = (req as any).validatedParams || req.params;
+    const result = await listingService.updateListing(params.id, guideId, updateData);
+
     successResponse(
       res,
       result,
@@ -192,11 +195,13 @@ const updateListing = catchAsync(
   }
 );
 
-
 const deleteListing = catchAsync(
   async (req: Request, res: Response, _next: NextFunction) => {
     const guideId = req.user!.userId;
-    await listingService.deleteListing(req.params.id, guideId);
+    const params = (req as any).validatedParams || req.params;
+
+    await listingService.deleteListing(params.id, guideId);
+
     successResponse(
       res,
       null,
@@ -207,10 +212,10 @@ const deleteListing = catchAsync(
   }
 );
 
-
 const permanentlyDeleteListing = catchAsync(
   async (req: Request, res: Response, _next: NextFunction) => {
-    await listingService.permanentlyDeleteListing(req.params.id);
+    const params = (req as any).validatedParams || req.params;
+    await listingService.permanentlyDeleteListing(params.id);
     successResponse(
       res,
       null,

@@ -14,7 +14,20 @@ export const validateRequest = (
     try {
       const dataToValidate = req[source];
       const validated = await schema.parseAsync(dataToValidate);
-      (req as any)[source] = validated;
+
+      // ✅ Attach validated data to a separate property
+      switch (source) {
+        case "body":
+          (req as any).validatedBody = validated;
+          break;
+        case "query":
+          (req as any).validatedQuery = validated;
+          break;
+        case "params":
+          (req as any).validatedParams = validated;
+          break;
+      }
+
       next();
     } catch (error) {
       if (error instanceof ZodError) {
@@ -39,6 +52,7 @@ export const validateRequest = (
   };
 };
 
+
 export const validateBody = (schema: z.ZodObject<any>) =>
   validateRequest(schema, "body");
 
@@ -60,7 +74,7 @@ export const validateMultiple = (schemas: {
       if (schemas.body) {
         try {
           const validated = await schemas.body.parseAsync(req.body);
-          (req as any).body = validated;
+          (req as any).validatedBody = validated;
         } catch (error) {
           if (error instanceof ZodError) {
             errors.push(
@@ -77,7 +91,7 @@ export const validateMultiple = (schemas: {
       if (schemas.query) {
         try {
           const validated = await schemas.query.parseAsync(req.query);
-          (req as any).query = validated;
+          (req as any).validatedQuery = validated;
         } catch (error) {
           if (error instanceof ZodError) {
             errors.push(
@@ -94,7 +108,7 @@ export const validateMultiple = (schemas: {
       if (schemas.params) {
         try {
           const validated = await schemas.params.parseAsync(req.params);
-          (req as any).params = validated;
+          (req as any).validatedParams = validated;
         } catch (error) {
           if (error instanceof ZodError) {
             errors.push(
@@ -126,5 +140,6 @@ export const validateMultiple = (schemas: {
     }
   };
 };
+
 
 export default validateRequest;

@@ -59,8 +59,8 @@ router.get(
 
 router.get(
   "/",
-  authenticate,
-  authorize("admin"),
+  // authenticate,
+  // authorize("admin"),
   validateQuery(listingQuerySchema),
   listingController.getAllListings
 );

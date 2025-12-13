@@ -106,7 +106,7 @@ const createPaymentIntent = async (
       listingTitle: (booking as any).listing?.title,
       bookingDate: booking.bookingDate,
     },
-  })) as unknown as any; 
+  })) as unknown as any;
 
   booking.paymentStatus = "pending" as any;
   booking.paymentIntentId = paymentIntent.id;
@@ -233,32 +233,33 @@ const getAllPayments = async (
   if (startDate || endDate) {
     filter.createdAt = {};
     if (startDate) {
-      filter.createdAt.$gte = startDate;
+      filter.createdAt.$gte = new Date(startDate);
     }
     if (endDate) {
-      filter.createdAt.$lte = endDate;
+      filter.createdAt.$lte = new Date(endDate);
     }
   }
 
   if (minAmount !== undefined || maxAmount !== undefined) {
     filter.amount = {};
     if (minAmount !== undefined) {
-      filter.amount.$gte = minAmount;
+      filter.amount.$gte = Number(minAmount);
     }
     if (maxAmount !== undefined) {
-      filter.amount.$lte = maxAmount;
+      filter.amount.$lte = Number(maxAmount);
     }
   }
 
   const { skip } = parsePaginationParams({ page, limit });
 
-  const sortOrder: any = {};
-  if (sortBy.startsWith("-")) {
-    sortOrder[sortBy.substring(1)] = -1;
-  } else {
-    sortOrder[sortBy] = 1;
-  }
+  const sortField = typeof sortBy === "string" ? sortBy : "-createdAt";
 
+  const sortOrder: any = {};
+  if (sortField.startsWith("-")) {
+    sortOrder[sortField.substring(1)] = -1;
+  } else {
+    sortOrder[sortField] = 1;
+  }
   const total = await Payment.countDocuments(filter);
 
   const payments = await Payment.find(filter)
@@ -365,7 +366,7 @@ const refundPayment = async (
     amount: refundAmount,
     currency: payment.currency,
     paymentMethod: payment.paymentMethod,
-    status: PaymentStatus.COMPLETED, 
+    status: PaymentStatus.COMPLETED,
     transactionType: TransactionType.REFUND,
     metadata: {
       originalPaymentId: payment._id,

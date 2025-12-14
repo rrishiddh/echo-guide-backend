@@ -46,12 +46,12 @@ const createPaymentIntent = async (
     );
   }
 
-  if (booking.status !== BookingStatus.CONFIRMED) {
-    throw new ApiError(
-      httpStatus.BAD_REQUEST,
-      "Booking must be confirmed before payment"
-    );
-  }
+  // if (booking.status !== BookingStatus.CONFIRMED) {
+  //   throw new ApiError(
+  //     httpStatus.BAD_REQUEST,
+  //     "Booking must be confirmed before payment"
+  //   );
+  // }
 
   const existingPayment = await Payment.findOne({
     bookingId: payload.bookingId,

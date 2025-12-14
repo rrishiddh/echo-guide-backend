@@ -10,7 +10,7 @@ export const createListingSchema = z.object({
     .trim(),
   description: z
     .string()
-    .min(50, "Description must be at least 50 characters")
+    .min(1, "Description must be at least 50 characters")
     .max(2000, "Description cannot exceed 2000 characters")
     .trim(),
   itinerary: z
@@ -60,19 +60,19 @@ export const createListingSchema = z.object({
 export const updateListingSchema = z.object({
   title: z
     .string()
-    .min(10, "Title must be at least 10 characters")
+    .min(1, "Title must be at least 10 characters")
     .max(150, "Title cannot exceed 150 characters")
     .trim()
     .optional(),
   description: z
     .string()
-    .min(50, "Description must be at least 50 characters")
+    .min(1, "Description must be at least 50 characters")
     .max(2000, "Description cannot exceed 2000 characters")
     .trim()
     .optional(),
   itinerary: z
     .string()
-    .min(20, "Itinerary must be at least 20 characters")
+    .min(1, "Itinerary must be at least 20 characters")
     .max(3000, "Itinerary cannot exceed 3000 characters")
     .trim()
     .optional(),
@@ -88,7 +88,7 @@ export const updateListingSchema = z.object({
     .optional(),
   meetingPoint: z
     .string()
-    .min(5, "Meeting point must be at least 5 characters")
+    .min(1, "Meeting point must be at least 5 characters")
     .max(200, "Meeting point cannot exceed 200 characters")
     .trim()
     .optional(),
@@ -105,13 +105,13 @@ export const updateListingSchema = z.object({
     .optional(),
   city: z
     .string()
-    .min(2, "City must be at least 2 characters")
+    .min(1, "City must be at least 2 characters")
     .max(100, "City cannot exceed 100 characters")
     .trim()
     .optional(),
   country: z
     .string()
-    .min(2, "Country must be at least 2 characters")
+    .min(1, "Country must be at least 2 characters")
     .max(100, "Country cannot exceed 100 characters")
     .trim()
     .optional(),

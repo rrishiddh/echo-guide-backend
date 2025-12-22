@@ -70,26 +70,26 @@ export const createPaymentIntent = async (
 };
 
 
-export const confirmPaymentIntent = async (
-  paymentIntentId: string
-): Promise<Stripe.PaymentIntent> => {
-  const stripeInstance = getStripeInstance();
+// export const confirmPaymentIntent = async (
+//   paymentIntentId: string
+// ): Promise<Stripe.PaymentIntent> => {
+//   const stripeInstance = getStripeInstance();
 
-  try {
-    const paymentIntent = await stripeInstance.paymentIntents.confirm(
-      paymentIntentId
-    );
+//   try {
+//     const paymentIntent = await stripeInstance.paymentIntents.confirm(
+//       paymentIntentId
+//     );
 
-    logger.info(`Payment Intent confirmed: ${paymentIntentId}`);
-    return paymentIntent;
-  } catch (error: any) {
-    logger.error("Stripe Payment confirmation error:", error);
-    throw new ApiError(
-      httpStatus.BAD_REQUEST,
-      `Payment confirmation failed: ${error.message}`
-    );
-  }
-};
+//     logger.info(`Payment Intent confirmed: ${paymentIntentId}`);
+//     return paymentIntent;
+//   } catch (error: any) {
+//     logger.error("Stripe Payment confirmation error:", error);
+//     throw new ApiError(
+//       httpStatus.BAD_REQUEST,
+//       `Payment confirmation failed: ${error.message}`
+//     );
+//   }
+// };
 
 
 export const retrievePaymentIntent = async (
@@ -235,7 +235,7 @@ export const retrieveCustomer = async (
 export default {
   getStripeInstance,
   createPaymentIntent,
-  confirmPaymentIntent,
+  // confirmPaymentIntent,
   retrievePaymentIntent,
   cancelPaymentIntent,
   createRefund,

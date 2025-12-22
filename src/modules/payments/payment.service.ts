@@ -23,7 +23,7 @@ import {
 import { BookingStatus } from "../bookings/booking.interface";
 import {
   createPaymentIntent as stripeCreatePaymentIntent,
-  confirmPaymentIntent as stripeConfirmPaymentIntent,
+  // confirmPaymentIntent as stripeConfirmPaymentIntent,
   createRefund as stripeCreateRefund,
   createCustomer,
 } from "../../config/payment";
@@ -127,52 +127,52 @@ const createPaymentIntent = async (
   };
 };
 
-const confirmPayment = async (
-  touristId: string,
-  payload: IConfirmPaymentRequest
-) => {
-  await connectDatabase();
-  const payment = await Payment.findOne({
-    paymentIntentId: payload.paymentIntentId,
-  });
+// const confirmPayment = async (
+//   touristId: string,
+//   payload: IConfirmPaymentRequest
+// ) => {
+//   await connectDatabase();
+//   const payment = await Payment.findOne({
+//     paymentIntentId: payload.paymentIntentId,
+//   });
 
-  if (!payment) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Payment not found");
-  }
+//   if (!payment) {
+//     throw new ApiError(httpStatus.NOT_FOUND, "Payment not found");
+//   }
 
-  if (payment.touristId.toString() !== touristId) {
-    throw new ApiError(
-      httpStatus.FORBIDDEN,
-      "You can only confirm your own payments"
-    );
-  }
+//   if (payment.touristId.toString() !== touristId) {
+//     throw new ApiError(
+//       httpStatus.FORBIDDEN,
+//       "You can only confirm your own payments"
+//     );
+//   }
 
-  const paymentIntent = await stripeConfirmPaymentIntent(
-    payload.paymentIntentId
-  );
+//   const paymentIntent = await stripeConfirmPaymentIntent(
+//     payload.paymentIntentId
+//   );
 
-  if (paymentIntent.status === "succeeded") {
-    payment.status = PaymentStatus.COMPLETED;
-    payment.processedAt = new Date();
+//   if (paymentIntent.status === "succeeded") {
+//     payment.status = PaymentStatus.COMPLETED;
+//     payment.processedAt = new Date();
 
-    await Booking.findByIdAndUpdate(payment.bookingId, {
-      paymentStatus: "paid",
-    });
+//     await Booking.findByIdAndUpdate(payment.bookingId, {
+//       paymentStatus: "paid",
+//     });
 
-    logger.info(`Payment completed: ${payment._id}`);
-  } else if (paymentIntent.status === "processing") {
-    payment.status = PaymentStatus.PROCESSING;
-    logger.info(`Payment processing: ${payment._id}`);
-  } else {
-    payment.status = PaymentStatus.FAILED;
-    payment.failureReason = "Payment failed";
-    logger.warn(`Payment failed: ${payment._id}`);
-  }
+//     logger.info(`Payment completed: ${payment._id}`);
+//   } else if (paymentIntent.status === "processing") {
+//     payment.status = PaymentStatus.PROCESSING;
+//     logger.info(`Payment processing: ${payment._id}`);
+//   } else {
+//     payment.status = PaymentStatus.FAILED;
+//     payment.failureReason = "Payment failed";
+//     logger.warn(`Payment failed: ${payment._id}`);
+//   }
 
-  await payment.save();
+//   await payment.save();
 
-  return payment;
-};
+//   return payment;
+// };
 
 const getPaymentById = async (paymentId: string) => {
   await connectDatabase();
@@ -550,7 +550,7 @@ const handleChargeRefunded = async (charge: any) => {
 };
 export default {
   createPaymentIntent,
-  confirmPayment,
+  // confirmPayment,
   getPaymentById,
   getAllPayments,
   getTouristPayments,

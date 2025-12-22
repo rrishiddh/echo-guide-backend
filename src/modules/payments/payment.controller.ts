@@ -23,20 +23,20 @@ const createPaymentIntent = catchAsync(
 );
 
 
-const confirmPayment = catchAsync(
-  async (req: Request, res: Response, _next: NextFunction) => {
-    const touristId = req.user!.userId;
-    const result = await paymentService.confirmPayment(touristId, req.body);
+// const confirmPayment = catchAsync(
+//   async (req: Request, res: Response, _next: NextFunction) => {
+//     const touristId = req.user!.userId;
+//     const result = await paymentService.confirmPayment(touristId, req.body);
 
-    successResponse(
-      res,
-      result,
-      "Payment confirmed successfully!",
-      null,
-      httpStatus.OK
-    );
-  }
-);
+//     successResponse(
+//       res,
+//       result,
+//       "Payment confirmed successfully!",
+//       null,
+//       httpStatus.OK
+//     );
+//   }
+// );
 
 const getPaymentById = catchAsync(
   async (req: Request, res: Response, _next: NextFunction) => {
@@ -158,7 +158,7 @@ const handleWebhook = catchAsync(
 
 export default {
   createPaymentIntent,
-  confirmPayment,
+  // confirmPayment,
   getPaymentById,
   getAllPayments,
   getMyPayments,

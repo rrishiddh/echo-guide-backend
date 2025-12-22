@@ -60,13 +60,13 @@ router.post(
 );
 
 
-router.post(
-  "/confirm",
-  authenticate,
-  authorize("tourist"),
-  validateBody(confirmPaymentSchema),
-  paymentController.confirmPayment
-);
+// router.post(
+//   "/confirm",
+//   authenticate,
+//   authorize("tourist"),
+//   validateBody(confirmPaymentSchema),
+//   paymentController.confirmPayment
+// );
 
 
 router.get(

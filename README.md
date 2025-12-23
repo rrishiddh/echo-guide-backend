@@ -81,7 +81,7 @@ echo-guide-backend/
 
 ---
 
-## 🛠 Getting Started
+##  Getting Started
 
 ### Prerequisites
 
